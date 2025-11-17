@@ -1,0 +1,2781 @@
+🎯 Frontend UI/UX Architecture Specification
+Table of Contents
+
+Technical Foundation
+Landing Page (Detailed)
+Sign Up Flow
+Application Shell Architecture
+Component Library & Design System
+Responsive Behavior
+Animation & Interaction Patterns
+Critical Implementation Notes
+
+
+1. Technical Foundation
+Tech Stack
+- Framework: React 18+ with TypeScript
+- Styling: Tailwind CSS (core utilities only)
+- Icons: Lucide React
+- Fonts: Inter (variable) + JetBrains Mono for code
+- Build: Vite
+Design Tokens to Implement First
+javascript// colors.js
+const colors = {
+  midnight: '#0C1120',
+  gold: '#ECCE6E',
+  silver: '#C7CCD8',
+  pacific: '#1A2334',
+  moonlight: '#F8F9FB',
+  softSky: '#A8B1C4',
+  emerald: '#4ADE80',
+  skyBlue: '#38BDF8',
+  crimson: '#EF4444',
+}
+
+// spacing scale (Tailwind extended)
+// Use 8px base grid: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128
+
+// border radius
+// Buttons/cards: 8px
+// Panels: 12px
+// Modals: 16px
+
+// shadows (use sparingly)
+// Subtle: 0 1px 3px rgba(12, 17, 32, 0.12)
+// Medium: 0 4px 12px rgba(12, 17, 32, 0.15)
+// Panel: 0 8px 24px rgba(12, 17, 32, 0.20)
+```
+
+---
+
+## 2. Landing Page (Detailed Specification)
+
+### Overall Layout Structure
+```
+[Navbar - Fixed]
+[Hero Section - 100vh]
+[Agent Cards Section - Auto height]
+[Why This Exists - 80vh]
+[Use Cases - Auto height]
+[Features Strip - Auto height]
+[Final CTA - 60vh]
+[Footer]
+```
+
+---
+
+### 2.1 Navbar (Fixed Position)
+
+**Inspiration: Linear.app navbar + Anthropic.com header**
+
+**Structure:**
+```
+Logo (left) | [Agents] [Pricing] [Docs] (center-left) | [Sign In] [Try Free] (right)
+```
+
+**Specifications:**
+- Height: 64px
+- Background: `rgba(12, 17, 32, 0.8)` with `backdrop-blur-xl`
+- Border bottom: 1px solid `rgba(199, 204, 216, 0.1)`
+- Padding: 0 48px (desktop), 0 24px (mobile)
+- Logo: 32px height, white text "AURELIUM" in Inter SemiBold
+- Nav links: 14px, color `#F8F9FB`, hover → `#ECCE6E` transition 200ms
+- Buttons:
+  - "Sign In": Ghost button (transparent, border 1px `#C7CCD8`, text `#F8F9FB`)
+  - "Try Free": Filled (`#ECCE6E` bg, `#0C1120` text, semibold)
+  - Both: 36px height, 16px horizontal padding, 8px border radius
+
+**Interaction:**
+- Navbar appears with 300ms fade from top on page load
+- On scroll down past 100px: increase backdrop blur and reduce transparency
+- Sticky throughout
+
+---
+
+### 2.2 Hero Section
+
+**Inspiration: Vercel.com hero + Linear.app hero (calm, expansive)**
+
+**Layout:**
+```
+Centered content container (max-width: 1100px)
+
+[Headline]
+[Subheadline]
+[Two CTA buttons side by side]
+[Background: Subtle gradient mesh]
+```
+
+**Background:**
+- Base: `#0C1120`
+- Add subtle radial gradient mesh:
+  - Center: `rgba(236, 206, 110, 0.03)`
+  - Edges: `rgba(26, 35, 52, 0.6)`
+- Animated grain texture overlay (very subtle, 2% opacity)
+- **Reference for mesh style:** Stripe.com gradient backgrounds (2023 redesign) - soft, organic, NOT geometric
+
+**Headline:**
+```
+"Work with intelligent agents that 
+think, analyze, write, and automate."
+```
+- Font: Inter Bold
+- Size: 72px (desktop), 48px (tablet), 36px (mobile)
+- Color: `#F8F9FB`
+- Letter spacing: -0.02em (tight)
+- Line height: 1.1
+- Max width: 900px
+- Fade in from bottom with 600ms delay
+
+**Subheadline:**
+```
+"All your core workflows—automation, analysis, documents, 
+and research—handled by AI assistants that understand you, 
+coordinate together, and deliver results instantly."
+```
+- Font: Inter Regular
+- Size: 20px (desktop), 18px (mobile)
+- Color: `#A8B1C4`
+- Line height: 1.6
+- Max width: 700px
+- Margin top: 24px
+- Fade in from bottom with 800ms delay
+
+**CTA Buttons:**
+- Container: Flex row, gap 16px, margin top 48px
+- Primary: "Try It Free"
+  - BG: `#ECCE6E`, text: `#0C1120`, semibold
+  - Size: 52px height, 32px horizontal padding
+  - Font size: 16px
+  - Border radius: 8px
+  - Hover: Scale 1.02, brightness 1.1, shadow increase
+  - Transition: 200ms ease
+  
+- Secondary: "View Agents"
+  - Border: 1px solid `#C7CCD8`
+  - BG: transparent
+  - Text: `#F8F9FB`
+  - Same dimensions
+  - Hover: BG `rgba(199, 204, 216, 0.1)`, border color `#ECCE6E`
+
+**Animation timing:**
+- Headline: 0.6s delay
+- Subheadline: 0.8s delay
+- Buttons: 1.0s delay
+- All with ease-out cubic-bezier
+
+---
+
+### 2.3 Agent Cards Section
+
+**Inspiration: Notion.so feature cards + Hex.tech product showcase**
+
+**Layout:**
+- Full width container with centered content (max-width: 1400px)
+- Padding top/bottom: 160px
+- Background: `#0C1120` (same as hero, seamless)
+
+**Section Header:**
+```
+"Four Intelligent Agents. One Unified Workspace."
+```
+- Center aligned
+- Font: Inter SemiBold, 48px
+- Color: `#F8F9FB`
+- Margin bottom: 80px
+
+**Card Grid:**
+- CSS Grid: 2x2 on desktop, 1 column on mobile
+- Gap: 32px
+- Each card: Aspect ratio ~3:4 (portrait)
+
+**Individual Card Specifications:**
+
+**Card Container:**
+- Background: `#1A2334` (pacific gray)
+- Border: 1px solid `rgba(199, 204, 216, 0.15)`
+- Border radius: 16px
+- Padding: 40px
+- Hover state: 
+  - Border color: `rgba(236, 206, 110, 0.4)`
+  - Subtle lift: translateY(-4px)
+  - Shadow: `0 12px 32px rgba(12, 17, 32, 0.3)`
+  - Transition: 300ms ease
+
+**Card Content Structure:**
+```
+[Icon - 48px, gold color]
+[Agent Name - 28px semibold]
+[Tagline - 16px, muted]
+[Spacer - 24px]
+[Description paragraph - 15px, line-height 1.7]
+[Feature bullets - 14px, with checkmark icons]
+```
+
+**Atlas Card:**
+- Icon: Lucide `Network` or `Workflow` (gold `#ECCE6E`)
+- Name: "Atlas"
+- Tagline: "Your intelligent workflow architect."
+- Description: "Converts natural language into executable workflows. Plans, executes, and adapts—orchestrating other agents and real-world actions without code."
+- Bullets:
+  - "Multi-step automation"
+  - "Agent coordination"
+  - "Self-correcting execution"
+
+**Data Analyst Card:**
+- Icon: Lucide `BarChart3` or `TrendingUp`
+- Name: "Data Analyst"
+- Tagline: "Upload data. Ask questions. Get real analysis."
+- Description: "Accepts CSVs, Excel, PDFs. Writes Python, runs analysis in a secure sandbox, delivers clean charts and insights—instantly."
+- Bullets:
+  - "Python sandbox execution"
+  - "Interactive visualizations"
+  - "Statistical testing"
+
+**The Scribe Card:**
+- Icon: Lucide `FileText` or `BookOpen`
+- Name: "The Scribe"
+- Tagline: "Documents that look official, polished, effortless."
+- Description: "Transforms raw content into structured documents—reports, papers, proposals. Match existing formats or create from scratch."
+- Bullets:
+  - "PDF/DOCX output"
+  - "Citation management"
+  - "Format matching"
+
+**Researcher Card:**
+- Icon: Lucide `Search` or `Microscope`
+- Name: "Researcher"
+- Tagline: "Deep research, sources, and synthesis on demand."
+- Description: "Investigates across papers, articles, and datasets. Produces structured findings with evidence maps and verified citations."
+- Bullets:
+  - "Source verification"
+  - "Evidence mapping"
+  - "Contradiction detection"
+
+**Visual Reference:**
+- Look at Notion's feature cards BUT make yours darker and more sophisticated
+- Reference Hex.tech's product cards for the data/tech aesthetic
+- Reference Superhuman.com for the premium card hover states
+
+---
+
+### 2.4 "Why This Exists" Section
+
+**Inspiration: Apple product philosophy sections + Anthropic mission statement style**
+
+**Layout:**
+- Full bleed container
+- Background: Linear gradient from `#1A2334` (top) to `#0C1120` (bottom)
+- Padding: 160px vertical
+- Content: Centered, max-width 900px
+
+**Content:**
+```
+Headline: "Your work deserves more than chat responses."
+[Large 48px, Inter SemiBold, centered]
+
+Body (3 short paragraphs, each on separate line):
+"Most AI tools generate answers. Ours generate results."
+"Real documents. Real analyses. Real automation. Real workflows."
+"Everything previewed. Everything repeatable. Everything intelligent."
+
+[Each line: 24px, Inter Regular, color #C7CCD8, centered]
+[Spacing between lines: 20px]
+```
+
+**Animation:**
+- Fade in when 50% in viewport
+- Each paragraph line appears sequentially with 200ms stagger
+
+---
+
+### 2.5 Use Cases Section
+
+**Inspiration: Linear.app customer showcase + Replit.com use case cards**
+
+**Layout:**
+- Container: max-width 1200px, centered
+- Padding: 120px vertical
+- Background: `#0C1120`
+
+**Section Header:**
+```
+"Built for people who ship."
+[42px, Inter SemiBold, centered, margin-bottom 64px]
+```
+
+**Use Case Grid:**
+- 5 cards in horizontal scroll (desktop) / stack (mobile)
+- Card width: 280px
+- Gap: 24px
+- Snap scroll on mobile
+
+**Card Design:**
+- Height: 320px
+- Background: `rgba(26, 35, 52, 0.5)`
+- Border: 1px solid `rgba(199, 204, 216, 0.1)`
+- Border radius: 12px
+- Padding: 32px
+- Backdrop filter: blur(8px)
+
+**Card Content:**
+```
+[Icon - 40px, silver color]
+[Role Title - 20px semibold]
+[Description - 15px, line-height 1.6, color #A8B1C4]
+[Typical Tasks - 14px list with dots]
+```
+
+**Five Use Cases:**
+1. **Students & Researchers**
+   - Icon: `GraduationCap`
+   - Tasks: Literature reviews, Paper writing, Data analysis
+
+2. **Data Analysts & Engineers**
+   - Icon: `Code2`
+   - Tasks: Ad-hoc analysis, Report automation, Visualization
+
+3. **Founders & Operators**
+   - Icon: `Zap`
+   - Tasks: Market research, Deck creation, Process automation
+
+4. **Business Teams**
+   - Icon: `Users`
+   - Tasks: Reporting, Documentation, Competitive analysis
+
+5. **Writers & Creators**
+   - Icon: `PenTool`
+   - Tasks: Content structuring, Editing, Research synthesis
+
+**Interaction:**
+- Horizontal scroll with smooth momentum on desktop
+- Cards slightly scale on hover (1.03)
+
+---
+
+### 2.6 Features Strip
+
+**Inspiration: Vercel feature list + GitHub features grid**
+
+**Layout:**
+- Background: `#1A2334` full bleed
+- Padding: 96px vertical
+- Max-width: 1100px centered
+
+**Header:**
+```
+"Everything you need. Nothing you don't."
+[36px, centered, margin-bottom 56px]
+```
+
+**Features Grid:**
+- CSS Grid: 3 columns (desktop), 2 (tablet), 1 (mobile)
+- Gap: 48px horizontal, 40px vertical
+
+**Feature Item Structure:**
+```
+[Checkmark icon - 24px, gold]
+[Feature text - 16px, Inter Medium, color #F8F9FB]
+```
+
+**Features List:**
+- Natural language → structured workflows
+- Real-time preview panel
+- Secure Python sandbox
+- Multi-agent coordination
+- Upload files & reference styles
+- Auto-correction & reflection
+- Source citations
+- Version history
+
+**Styling:**
+- Each feature: flex row, gap 12px
+- Icon: Lucide `Check` in gold circle background
+- Text: Line height 1.5
+- Subtle fade-in on scroll
+
+---
+
+### 2.7 Final CTA Section
+
+**Inspiration: Linear.app bottom CTA + Superhuman final section**
+
+**Layout:**
+- Full viewport height (60vh minimum)
+- Centered content
+- Background: Radial gradient from `rgba(236, 206, 110, 0.08)` center to `#0C1120` edges
+
+**Content:**
+```
+[Large Headline]
+"Work faster. Think deeper. Automate smarter."
+[56px, Inter Bold, letter-spacing -0.02em]
+
+[Single button]
+"Get Started Free"
+[Larger than previous: 56px height, 40px horizontal padding]
+[Background: #ECCE6E, text: #0C1120]
+[Add subtle glow effect on hover]
+```
+
+**Animation:**
+- Content fades in with scale from 0.95 to 1.0
+- Button pulses subtly every 3 seconds (scale 1.0 → 1.05 → 1.0)
+
+---
+
+### 2.8 Footer
+
+**Inspiration: Anthropic footer + Notion footer**
+
+**Layout:**
+- Background: `#0C1120`
+- Border top: 1px solid `rgba(199, 204, 216, 0.1)`
+- Padding: 64px vertical, 48px horizontal
+- Max-width: 1400px centered
+
+**Structure:**
+```
+[Left Column]
+Logo + Tagline
+
+[Middle Columns - 3 columns]
+Product | Resources | Company
+
+[Right Column]
+Social icons
+```
+
+**Styling:**
+- Logo: 28px, white
+- Tagline: 14px, `#A8B1C4`, margin-top 12px
+- Column headers: 14px, `#F8F9FB`, semibold, margin-bottom 16px
+- Links: 14px, `#A8B1C4`, hover → `#ECCE6E`
+- Copyright: 14px, `#A8B1C4`, centered, border-top, padding-top 32px, margin-top 48px
+
+**Links:**
+- Product: Atlas, Data Analyst, Scribe, Researcher
+- Resources: Docs, Blog, API, Examples
+- Company: About, Careers, Privacy, Terms
+
+---
+
+## 3. Sign Up Flow
+
+### 3.1 Sign Up Page Layout
+
+**Inspiration: Linear signup + Notion signup (split-screen design)**
+
+**Page Structure:**
+```
+[Left Panel - 45%] | [Right Panel - 55%]
+```
+
+**Left Panel (Brand/Benefits):**
+- Background: `#1A2334`
+- Padding: 64px
+
+**Content:**
+```
+[Logo - top left]
+[Headline: "Start building with intelligent agents"]
+[Subtext: "Join teams using Aurelium to automate, analyze, and create."]
+
+[Three benefit points with icons:]
+✓ Free to start
+✓ No credit card required
+✓ Full access to all agents
+
+[Background decoration: Subtle mesh gradient similar to hero]
+```
+
+**Right Panel (Form):**
+- Background: `#0C1120`
+- Padding: 64px
+- Centered vertically
+
+**Form Container:**
+- Max-width: 400px
+- Centered in panel
+
+**Form Structure:**
+```
+[Headline: "Create your account"]
+[16px margin bottom]
+
+[Social signup button - Google]
+[Divider: "or"]
+[Email input field]
+[Password input field]
+[Confirm password field]
+[Submit button: "Create Account"]
+
+[Footer text: "Already have an account? Sign in"]
+[Terms acceptance text in small gray]
+```
+
+### 3.2 Form Component Specifications
+
+**Google OAuth Button:**
+- Height: 48px
+- Background: White
+- Border: 1px solid `#C7CCD8`
+- Border radius: 8px
+- Text: "Continue with Google" (14px, `#0C1120`)
+- Google icon: 20px on left side
+- Full width
+- Hover: Border color `#ECCE6E`, subtle lift
+
+**Divider:**
+- Text: "or" in center
+- Lines on both sides
+- Color: `rgba(199, 204, 216, 0.3)`
+- Margin: 24px vertical
+
+**Input Fields:**
+- Height: 48px
+- Background: `rgba(26, 35, 52, 0.5)`
+- Border: 1px solid `rgba(199, 204, 216, 0.2)`
+- Border radius: 8px
+- Padding: 0 16px
+- Font: 15px Inter
+- Color: `#F8F9FB`
+- Placeholder color: `#A8B1C4`
+- Focus state:
+  - Border: `#ECCE6E`
+  - Outline: none
+  - Background: `rgba(26, 35, 52, 0.8)`
+- Error state:
+  - Border: `#EF4444`
+  - Small error text below in red
+- Spacing between fields: 16px
+
+**Labels:**
+- 14px, `#C7CCD8`, semibold
+- Margin-bottom: 8px from field
+
+**Submit Button:**
+- Height: 52px
+- Background: `#ECCE6E`
+- Text: "Create Account" (`#0C1120`, semibold, 16px)
+- Border radius: 8px
+- Full width
+- Margin-top: 24px
+- Loading state: Spinner icon, disabled appearance
+- Hover: Brightness 1.1, slight shadow
+
+**Footer Links:**
+- 14px, center aligned
+- "Already have an account?" in `#A8B1C4`
+- "Sign in" in `#ECCE6E`, underline on hover
+- Margin-top: 24px
+
+**Terms Text:**
+- 12px, `#A8B1C4`
+- "By signing up, you agree to our Terms and Privacy Policy"
+- Links underlined
+- Margin-top: 16px
+
+### 3.3 Sign In Page (Variant)
+
+Same layout but simpler form:
+```
+[Email field]
+[Password field]
+[Forgot password? - link]
+[Sign In button]
+[Don't have an account? Sign up - link]
+```
+
+**Additional Element:**
+- "Forgot password?" link (14px, `#ECCE6E`, right-aligned under password field)
+
+### 3.4 Post-Signup Onboarding Modal
+
+**Trigger:** Immediately after successful account creation
+
+**Modal Specs:**
+- Overlay: `rgba(12, 17, 32, 0.9)` with backdrop blur
+- Modal width: 600px (desktop), 90% (mobile)
+- Background: `#1A2334`
+- Border: 1px solid `rgba(236, 206, 110, 0.3)`
+- Border radius: 16px
+- Padding: 48px
+- Center screen, fade + scale in animation
+
+**Content:**
+```
+[Welcome icon - 64px, gold]
+[Headline: "Welcome to Aurelium ✨"]
+[Subtext: "Choose how you want to begin:"]
+
+[Four option cards in 2x2 grid:]
+1. Analyze Data [icon: BarChart]
+2. Write a Document [icon: FileText]
+3. Do Research [icon: Search]
+4. Automate Something [icon: Zap]
+
+[Skip button at bottom: "I'll explore on my own"]
+```
+
+**Option Card:**
+- Height: 140px
+- Background: `rgba(12, 17, 32, 0.5)`
+- Border: 1px solid `rgba(199, 204, 216, 0.15)`
+- Border radius: 12px
+- Padding: 24px
+- Hover: Border `#ECCE6E`, translate up slightly
+- Content: Icon (32px top), Label (18px semibold), Brief description (14px muted)
+
+**Behavior:**
+- Clicking a card → Close modal → Open app with selected agent active + helpful prompt preset
+
+---
+
+## 4. Application Shell Architecture
+
+### 4.1 Overall Layout
+
+**Inspiration: Linear.app main app + Notion workspace**
+```
+┌─────────────────────────────────────────────────────┐
+│ Top Bar (64px fixed)                                │
+├──────────┬──────────────────────────┬────────────────┤
+│          │                          │                │
+│ Left     │   Center Preview Pane    │  Right Chat   │
+│ Sidebar  │      (60% width)         │  Panel (30%)  │
+│ (240px)  │                          │                │
+│          │                          │                │
+│          │                          │                │
+└──────────┴──────────────────────────┴────────────────┘
+```
+
+### 4.2 Top Bar
+
+**Fixed position, full width**
+
+**Structure:**
+```
+[Workspace dropdown] | [Breadcrumb / Context] | [Account menu]
+```
+
+- Height: 64px
+- Background: `#1A2334`
+- Border bottom: 1px solid `rgba(199, 204, 216, 0.1)`
+- Backdrop blur: 16px
+- Z-index: 100
+
+**Left Section:**
+- Workspace dropdown (shows current workspace name + chevron)
+- 200px width
+
+**Center Section:**
+- Breadcrumb or current context
+- Example: "Atlas > Email Campaign Workflow"
+- 14px, `#A8B1C4`
+
+**Right Section:**
+- Notifications icon (bell)
+- Settings icon (gear)
+- Profile avatar (32px circle, with dropdown)
+- Gap: 16px between items
+
+---
+
+### 4.3 Left Sidebar
+
+**Inspiration: Linear sidebar + Notion sidebar**
+
+**Width:** 240px (collapsible to 64px icon-only mode)
+
+**Background:** `#0C1120`
+
+**Border right:** 1px solid `rgba(199, 204, 216, 0.1)`
+
+**Structure:**
+```
+[Logo - 40px padding]
+[Search bar - 32px padding horizontal]
+---
+[Agent List]
+  - Atlas
+  - Data Analyst
+  - Scribe
+  - Researcher
+---
+[Recent Tasks]
+---
+[Bottom: Settings, Profile]
+```
+
+**Agent List Items:**
+- Height: 40px each
+- Padding: 0 16px
+- Border radius: 6px (when inside 12px margin container)
+- Flex: icon (20px) + label (14px semibold)
+- Gap: 12px
+- Normal state: Transparent
+- Hover state: Background `rgba(199, 204, 216, 0.05)`
+- Active state: Background `rgba(236, 206, 110, 0.1)`, border-left 2px `#ECCE6E`
+- Icon color: `#C7CCD8` (normal), `#ECCE6E` (active)
+- Text color: `#F8F9FB` (normal), `#ECCE6E` (active)
+
+**Recent Tasks:**
+- Section header: 12px, uppercase, `#A8B1C4`, semibold, 16px left padding
+- Task items: Similar to agent items but smaller (36px height)
+- Show agent icon + truncated task name
+- Max 5 items, "View all" link at bottom
+
+**Collapsed State:**
+- Width: 64px
+- Show only icons
+- Tooltip appears on hover with label
+
+---
+
+### 4.4 Center Preview Pane
+
+**This is the most important panel - where outputs render**
+
+**Width:** 60% of remaining space (after sidebar)
+
+**Background:** `#0C1120`
+
+**Specifications:**
+
+**Header Bar:**
+- Height: 56px
+- Background: `rgba(26, 35, 52, 0.5)`
+- Border bottom: 1px solid `rgba(199, 204, 216, 0.1)`
+- Content: Agent name + task title
+- Actions on right: Download, Share, More options
+
+**Content Area:**
+- Padding: 32px (desktop), 24px (mobile)
+- Overflow-y: auto
+- Custom scrollbar (thin, gold thumb on dark track)
+
+**Content Changes Per Agent:**
+
+**Atlas (Automation Timeline):**
+- Vertical timeline on left (thin gold line)
+- Each step: Card with icon, title, status, duration
+- Collapsible for detailed logs
+- Status colors: Running (blue), Success (green), Error (red)
+- **Reference:** Airplane.dev execution view BUT make it vertical
+
+**Data Analyst (Charts & Tables):**
+- Rich output rendering
+- Tables: Stripe rows, clean headers, monospace numbers
+- Charts: Full width, clean axes, gold accents
+- Code blocks: Collapsible, with copy button
+- **Reference:** Observable HQ notebooks + Hex.tech output cells
+
+**Scribe (Document Preview):**
+- PDF-like rendering
+- White/cream background for document area
+- Page numbers
+- Zoom controls top-right
+- **Reference:** Notion page preview + Dropbox Paper view mode
+
+**Researcher (Research Dashboard):**
+- Source cards in grid (2-3 columns)
+- Each card: Title, snippet, citation, link
+- Top section: Key insights summary
+- Collapsible sections for different topics
+- **Reference:** Perplexity Collections + Elicit source cards
+
+---
+
+### 4.5 Right Chat Panel
+
+**Width:** 30% of remaining space
+
+**Background:** `#1A2334`
+
+**Border left:** 1px solid `rgba(199, 204, 216, 0.1)`
+
+**Structure:**
+```
+[Agent avatar + name - header]
+[Chat message area - flex-grow, scroll]
+[Input area - fixed bottom]
+Header:
+
+Height: 56px
+Agent icon (40px) + name (16px semibold)
+Padding: 16px
+Border bottom: 1px rgba(199, 204, 216, 0.1)
+
+Chat Area:
+
+Padding: 24px 16px
+Messages stack vertically
+Gap: 16px between messages
+
+Message Bubbles:
+User Message:
+
+Background: rgba(236, 206, 110, 0.1)
+Border: 1px solid rgba(236, 206, 110, 0.2)
+Border radius: 12px
+Padding: 12px 16px
+Text: 15px, #F8F9FB
+Max-width: 80%
+Align right
+
+Agent Message:
+
+Background: rgba(26, 35, 52, 0.8)
+Border: 1px solid rgba(199, 204, 216, 0.15)
+Border radius: 12px
+Padding: 12px 16px
+Text: 15px, #F8F9FB, line-height 1.6
+Max-width: 90%
+Align left
+Can contain: Text, code blocks, buttons, file uploads
+
+Special Message Elements:
+
+Code: Inline backticks styled with #ECCE6E background
+Buttons: Small, ghost style with gold borders
+Loading dots: Three bouncing dots in gold
+
+Input Area:
+
+Fixed at bottom
+Background: #1A2334
+Border top: 1px solid rgba(199, 204, 216, 0.1)
+Padding: 16px
+
+Input Field:
+
+Multi-line textarea
+Min-height: 48px, max-height: 200px (auto-grow)
+Background: #0C1120
+Border: 1px solid rgba(199, 204, 216, 0.2)
+Border radius: 8px
+Padding: 12px 48px 12px 16px (space for send button)
+Font: 15px Inter
+Placeholder: "Ask [Agent Name]..."
+Focus: Border #ECCE6E
+
+Send Button:
+
+Position: Absolute, bottom-right inside textarea
+Size: 32px circle
+Background: #ECCE6E
+Icon: Lucide Send in #0C1120
+Disabled when empty (opacity 0.4)
+
+Attachment Button:
+
+Left side of input
+Icon button (paperclip)
+Opens file picker
+
+
+5. Component Library & Design System
+5.1 Button Variants
+Primary:
+cssbackground: #ECCE6E
+color: #0C1120
+padding: 12px 24px
+border-radius: 8px
+font-weight: 600
+hover: brightness(1.1), scale(1.02)
+Secondary:
+cssbackground: transparent
+border: 1px solid #C7CCD8
+color: #F8F9FB
+padding: 12px 24px
+border-radius: 8px
+hover: background rgba(199, 204, 216, 0.1), border #ECCE6E
+Ghost:
+cssbackground: transparent
+color: #F8F9FB
+padding: 12px 24px
+hover: background rgba(199, 204, 216, 0.05)
+Icon Button:
+csswidth: 36px
+height: 36px
+border-radius: 6px
+background: transparent
+hover: background rgba(199, 204, 216, 0.1)
+5.2 Form Elements
+Input Field (default):
+cssheight: 48px
+background: rgba(26, 35, 52, 0.5)
+border: 1px solid rgba(199, 204, 216, 0.2)
+border-radius: 8px
+padding: 0 16px
+color: #F8F9FB
+font-size: 15px
+
+focus:
+  border-color: #ECCE6E
+  outline: none
+  background: rgba(26, 35, 52, 0.8)
+Textarea:
+Same as input but with vertical resize and min-height 120px
+Select Dropdown:
+Same styling as input with chevron-down icon on right
+Checkbox:
+csssize: 20px
+border: 1px solid #C7CCD8
+border-radius: 4px
+checked:
+  background: #ECCE6E
+  border-color: #ECCE6E
+  checkmark in #0C1120
+Radio Button:
+Same as checkbox but circular (border-radius 50%)
+5.3 Card Components
+Standard Card:
+cssbackground: #1A2334
+border: 1px solid rgba(199, 204, 216, 0.15)
+border-radius: 12px
+padding: 24px
+
+hover:
+  border-color: rgba(236, 206, 110, 0.4)
+  transform: translateY(-2px)
+  shadow: 0 8px 24RetryDContinuepx rgba(12, 17, 32, 0.25)
+
+**Feature Card (for agent showcases):**
+```css
+background: rgba(26, 35, 52, 0.6)
+border: 1px solid rgba(199, 204, 216, 0.12)
+border-radius: 16px
+padding: 32px
+backdrop-filter: blur(12px)
+
+hover:
+  border-color: #ECCE6E
+  transform: translateY(-4px)
+  shadow: 0 12px 32px rgba(236, 206, 110, 0.15)
+  transition: all 300ms ease
+```
+
+**Status Card (for workflow steps):**
+```css
+background: rgba(12, 17, 32, 0.8)
+border-left: 3px solid [status-color]
+border-radius: 8px
+padding: 16px 20px
+
+status colors:
+  pending: #A8B1C4
+  running: #38BDF8
+  success: #4ADE80
+  error: #EF4444
+```
+
+### 5.4 Modal Components
+
+**Standard Modal:**
+```css
+overlay:
+  background: rgba(12, 17, 32, 0.85)
+  backdrop-filter: blur(8px)
+  
+modal:
+  background: #1A2334
+  border: 1px solid rgba(199, 204, 216, 0.2)
+  border-radius: 16px
+  max-width: 600px
+  padding: 40px
+  shadow: 0 20px 60px rgba(0, 0, 0, 0.4)
+  
+animation:
+  enter: fade + scale(0.95 → 1.0), 300ms ease-out
+  exit: fade + scale(1.0 → 0.95), 200ms ease-in
+```
+
+**Confirmation Modal (smaller):**
+Same styling but max-width 400px, padding 32px
+
+**Drawer (right slide-in):**
+```css
+position: fixed right
+width: 480px (desktop), 100% (mobile)
+height: 100vh
+background: #1A2334
+border-left: 1px solid rgba(199, 204, 216, 0.15)
+shadow: -4px 0 24px rgba(0, 0, 0, 0.3)
+
+animation:
+  enter: translateX(100% → 0), 300ms ease-out
+  exit: translateX(0 → 100%), 250ms ease-in
+```
+
+### 5.5 Data Display Components
+
+**Table:**
+```css
+width: 100%
+border-collapse: collapse
+
+thead:
+  background: rgba(26, 35, 52, 0.5)
+  border-bottom: 2px solid rgba(199, 204, 216, 0.2)
+  
+th:
+  padding: 12px 16px
+  text-align: left
+  font-size: 13px
+  font-weight: 600
+  color: #C7CCD8
+  text-transform: uppercase
+  letter-spacing: 0.05em
+
+tbody tr:
+  border-bottom: 1px solid rgba(199, 204, 216, 0.08)
+  
+  hover:
+    background: rgba(26, 35, 52, 0.3)
+    
+td:
+  padding: 16px
+  font-size: 14px
+  color: #F8F9FB
+  
+td[data-type="number"]:
+  font-family: JetBrains Mono
+  text-align: right
+  color: #ECCE6E
+```
+
+**Code Block:**
+```css
+background: #0C1120
+border: 1px solid rgba(199, 204, 216, 0.15)
+border-radius: 8px
+padding: 16px
+font-family: JetBrains Mono
+font-size: 13px
+line-height: 1.6
+color: #F8F9FB
+overflow-x: auto
+
+header (optional):
+  background: rgba(26, 35, 52, 0.5)
+  padding: 8px 16px
+  border-bottom: 1px solid rgba(199, 204, 216, 0.1)
+  display: flex
+  justify-content: space-between
+  
+  [language label] [copy button]
+```
+
+**Badge/Tag:**
+```css
+display: inline-flex
+padding: 4px 10px
+border-radius: 6px
+font-size: 12px
+font-weight: 600
+
+variants:
+  default: background rgba(199, 204, 216, 0.15), color #C7CCD8
+  success: background rgba(74, 222, 128, 0.15), color #4ADE80
+  warning: background rgba(251, 191, 36, 0.15), color #FBB024
+  error: background rgba(239, 68, 68, 0.15), color #EF4444
+  accent: background rgba(236, 206, 110, 0.15), color #ECCE6E
+```
+
+**Progress Bar:**
+```css
+height: 8px
+background: rgba(26, 35, 52, 0.8)
+border-radius: 4px
+overflow: hidden
+
+fill:
+  background: linear-gradient(90deg, #ECCE6E 0%, #F0D98D 100%)
+  height: 100%
+  transition: width 300ms ease
+  
+with-percentage-label:
+  show above or to right
+  font-size: 13px
+  color: #C7CCD8
+  font-weight: 600
+```
+
+**Skeleton Loader:**
+```css
+background: linear-gradient(
+  90deg,
+  rgba(26, 35, 52, 0.4) 0%,
+  rgba(26, 35, 52, 0.6) 50%,
+  rgba(26, 35, 52, 0.4) 100%
+)
+background-size: 200% 100%
+animation: shimmer 1.5s infinite
+border-radius: 4px
+
+@keyframes shimmer:
+  0%: background-position: -200% 0
+  100%: background-position: 200% 0
+```
+
+---
+
+## 6. Responsive Behavior
+
+### 6.1 Breakpoints
+```javascript
+const breakpoints = {
+  mobile: '0-767px',
+  tablet: '768-1023px',
+  desktop: '1024-1439px',
+  wide: '1440px+'
+}
+```
+
+### 6.2 Landing Page Responsive Rules
+
+**Mobile (< 768px):**
+- Navbar: Hamburger menu, logo centered
+- Hero headline: 36px (from 72px)
+- Hero subtext: 16px (from 20px)
+- Agent cards: Single column, full width
+- Use cases: Vertical stack (no horizontal scroll)
+- Padding reduced: 24px (from 48px)
+- CTA buttons: Stack vertically, full width
+
+**Tablet (768-1023px):**
+- Agent cards: 2 columns
+- Hero headline: 56px
+- Maintain horizontal padding at 32px
+
+**Desktop (1024px+):**
+- Use full specifications as outlined
+
+### 6.3 Application Shell Responsive
+
+**Mobile (< 768px):**
+Sidebar: Hidden by default, overlay on toggle
+Preview Pane: 100% width
+Chat Panel: Hidden by default, accessible via floating button
+
+Floating button: Fixed bottom-right, 56px circle, gold background
+Opens as full-screen overlay when tapped
+
+Layout becomes:
+┌─────────────────────────┐
+│ Top Bar (with menu)     │
+├─────────────────────────┤
+│                         │
+│  Preview Pane (100%)    │
+│                         │
+│                         │
+└─────────────────────────┘
+[Chat FAB]
+
+**Tablet (768-1023px):**
+Sidebar: 64px (icon-only mode)
+Preview: 65%
+Chat: 35%
+
+**Desktop (1024px+):**
+- Full three-panel layout as specified
+
+### 6.4 Touch Interactions (Mobile/Tablet)
+
+**Swipe Gestures:**
+- Swipe right: Open sidebar (mobile)
+- Swipe left: Close sidebar (mobile)
+- Swipe up on chat FAB: Open chat panel full screen
+
+**Tap Targets:**
+- Minimum 44px height/width for all interactive elements
+- Increased padding on mobile buttons (16px vertical)
+
+---
+
+## 7. Animation & Interaction Patterns
+
+### 7.1 Page Transitions
+
+**Route Changes:**
+```css
+exit: fade out 150ms ease-in
+enter: fade in + translateY(12px → 0) 300ms ease-out
+```
+
+**Modal/Overlay Entry:**
+```css
+overlay: fade in 200ms
+content: fade in + scale(0.96 → 1.0) 250ms cubic-bezier(0.16, 1, 0.3, 1)
+```
+
+**Drawer Entry:**
+```css
+translateX(100% → 0) 300ms cubic-bezier(0.16, 1, 0.3, 1)
+```
+
+### 7.2 Micro-interactions
+
+**Button Hover:**
+```css
+transform: translateY(-1px)
+transition: 150ms ease
+shadow increase
+```
+
+**Button Active (click):**
+```css
+transform: scale(0.98)
+transition: 100ms ease
+```
+
+**Card Hover:**
+```css
+transform: translateY(-4px)
+border-color transition: 200ms
+shadow transition: 300ms
+```
+
+**Input Focus:**
+```css
+border-color change: 200ms ease
+background change: 200ms ease
+subtle glow effect (optional): box-shadow with accent color
+```
+
+**Loading States:**
+
+**Spinner:**
+```css
+size: 20px (default), 32px (large)
+border: 2px solid rgba(236, 206, 110, 0.2)
+border-top-color: #ECCE6E
+border-radius: 50%
+animation: spin 800ms linear infinite
+```
+
+**Pulsing Dot:**
+```css
+size: 8px
+background: #ECCE6E
+border-radius: 50%
+animation: pulse 1.5s ease-in-out infinite
+
+@keyframes pulse:
+  0%, 100%: opacity 1, scale 1
+  50%: opacity 0.5, scale 1.1
+```
+
+**Skeleton Loading:**
+As specified in 5.5 above
+
+### 7.3 Scroll Animations
+
+**Fade In on Scroll:**
+```javascript
+// Trigger when element is 30% in viewport
+opacity: 0 → 1
+translateY: 24px → 0
+duration: 600ms
+easing: ease-out
+stagger: 100ms between elements (if multiple)
+```
+
+**Parallax (subtle, hero section only):**
+```javascript
+// Background moves slower than foreground
+transform: translateY(scrollY * 0.5)
+```
+
+**Sticky Header Behavior:**
+```javascript
+// On scroll down past 100px:
+- Reduce padding
+- Add shadow
+- Increase backdrop blur
+// Transition: 300ms ease
+```
+
+### 7.4 Data Loading Patterns
+
+**Progressive Loading (Large Data Tables):**
+1. Show skeleton rows (5-10)
+2. Replace with real data as it loads
+3. Smooth height transition
+4. Add "Load more" button at bottom
+
+**Chart/Visualization Loading:**
+1. Show empty chart frame with skeleton
+2. Fade in axes and labels first
+3. Animate data points/bars from 0 to value (500ms stagger)
+
+**Chat Message Streaming:**
+```javascript
+// As text arrives:
+- Cursor blink at current position
+- Text appears character by character OR
+- Text appears word by word (smoother)
+- Auto-scroll to bottom
+- Smooth height expansion of message bubble
+```
+
+---
+
+## 8. Critical Implementation Notes
+
+### 8.1 Performance Requirements
+
+**Bundle Size:**
+- Initial load: < 200KB (gzipped)
+- Use code splitting for agent-specific code
+- Lazy load chart libraries (Recharts) only when needed
+
+**Image Optimization:**
+- Use WebP format with JPEG fallback
+- Lazy load images below fold
+- Use `loading="lazy"` attribute
+- Provide low-quality placeholders (LQIP)
+
+**Font Loading:**
+```css
+/* Prevent FOIT (Flash of Invisible Text) */
+font-display: swap;
+
+/* Preload critical fonts */
+<link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+```
+
+**Rendering:**
+- Use CSS containment for complex components
+- Virtualize long lists (react-window)
+- Debounce search/filter inputs (300ms)
+
+### 8.2 Accessibility Requirements
+
+**Keyboard Navigation:**
+- All interactive elements must be focusable
+- Logical tab order throughout
+- Visible focus indicators (2px gold outline with offset)
+- Escape key closes modals/drawers
+- Enter/Space activates buttons
+
+**Focus Indicator:**
+```css
+:focus-visible {
+  outline: 2px solid #ECCE6E;
+  outline-offset: 2px;
+}
+```
+
+**Screen Reader Support:**
+- Semantic HTML (nav, main, article, aside)
+- ARIA labels for icon-only buttons
+- ARIA live regions for dynamic content
+- Alt text for all images (even decorative: alt="")
+- Form labels properly associated
+
+**Color Contrast:**
+- All text meets WCAG AA standards
+- Primary text on dark: #F8F9FB (17.8:1 ratio) ✓
+- Muted text: #A8B1C4 (8.5:1 ratio) ✓
+- Gold accent on dark: #ECCE6E (12.2:1 ratio) ✓
+
+**Reduced Motion:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### 8.3 Browser Support
+
+**Target:**
+- Chrome/Edge: Last 2 versions
+- Firefox: Last 2 versions
+- Safari: Last 2 versions
+- Mobile Safari: iOS 14+
+- Chrome Mobile: Android 9+
+
+**Fallbacks:**
+- Backdrop-filter: Use solid background fallback
+- CSS Grid: Use Flexbox fallback
+- Custom properties: Provide static values
+
+### 8.4 State Management
+
+**Recommendations:**
+- Use Zustand for global state (lightweight)
+- React Query for server state
+- Local state (useState) for UI-only state
+
+**Key State Slices:**
+```javascript
+// authStore
+- user
+- token
+- isAuthenticated
+
+// workspaceStore
+- currentAgent
+- activeTasks
+- recentTasks
+
+// uiStore
+- sidebarCollapsed
+- chatPanelOpen
+- activeModal
+```
+
+### 8.5 Error Handling UX
+
+**Network Errors:**
+Toast notification (top-right):
+
+Red icon
+"Connection lost. Retrying..."
+Auto-dismiss on reconnect
+
+
+**Form Validation:**
+Inline errors below field:
+
+Icon (AlertCircle from Lucide)
+Red text (12px)
+Field border turns red
+Show after blur or submit attempt
+
+
+**API Errors:**
+Modal for critical errors:
+
+Error icon (40px, red)
+Clear message
+Suggestion for resolution
+[Try Again] [Contact Support] buttons
+
+
+**Empty States:**
+Center-aligned content:
+
+Illustration or icon (64px, silver)
+Headline (18px semibold)
+Description (14px muted)
+Primary action button
+
+Example:
+"No tasks yet"
+"Start by selecting an agent and describing what you need."
+[Start Task]
+
+### 8.6 Loading States
+
+**Full Page Load:**
+Centered spinner with logo:
+
+Logo at 48px
+Spinner below (32px)
+Optional: "Loading..." text (14px muted)
+
+
+**Component Load:**
+- Skeleton loaders matching content shape
+- Maintain layout stability (no shifts)
+
+**Button Loading:**
+- Replace button text with spinner
+- Maintain button width (don't collapse)
+- Disable button interaction
+
+**Progressive Enhancement:**
+- Show basic content immediately
+- Enhance with JavaScript
+- Ensure core functionality works without JS (where possible)
+
+---
+
+## 9. Development Workflow & Checklist
+
+### 9.1 Component Development Order
+
+**Phase 1 - Foundation (Week 1):**
+1. Set up design tokens (colors, spacing, typography)
+2. Create base components:
+   - Button (all variants)
+   - Input/Textarea
+   - Card
+   - Modal
+3. Implement layout shell (without content)
+
+**Phase 2 - Landing Page (Week 2):**
+1. Navbar
+2. Hero section
+3. Agent cards section
+4. Features and CTA
+5. Footer
+6. Responsive adjustments
+
+**Phase 3 - Auth Flow (Week 2-3):**
+1. Sign up page
+2. Sign in page
+3. Onboarding modal
+4. Form validation
+
+**Phase 4 - Application Shell (Week 3-4):**
+1. Top bar
+2. Sidebar navigation
+3. Preview pane structure
+4. Chat panel
+5. Panel resizing logic
+
+**Phase 5 - Agent-Specific Views (Week 4-6):**
+1. Atlas timeline view
+2. Data Analyst output rendering
+3. Scribe document preview
+4. Researcher dashboard
+5. Task management views
+
+**Phase 6 - Polish (Week 6-7):**
+1. Animations and transitions
+2. Loading states
+3. Error handling
+4. Accessibility audit
+5. Performance optimization
+6. Cross-browser testing
+
+### 9.2 Quality Checklist (Per Component)
+
+**Visual:**
+- [ ] Matches design specifications exactly
+- [ ] Proper spacing (8px grid adherence)
+- [ ] Correct colors (no hard-coded values)
+- [ ] Hover states implemented
+- [ ] Focus states visible
+- [ ] Loading states handled
+- [ ] Empty states designed
+
+**Functional:**
+- [ ] Works on mobile, tablet, desktop
+- [ ] Keyboard navigation works
+- [ ] Screen reader compatible
+- [ ] Handles errors gracefully
+- [ ] No console errors
+- [ ] No memory leaks
+
+**Performance:**
+- [ ] No unnecessary re-renders
+- [ ] Images optimized
+- [ ] Animations smooth (60fps)
+- [ ] Code split appropriately
+
+**Code Quality:**
+- [ ] TypeScript types defined
+- [ ] Props documented
+- [ ] Reusable and composable
+- [ ] No hardcoded strings (i18n ready)
+- [ ] Tests written
+
+---
+
+## 10. Specific Inspiration References (With URLs)
+
+### 10.1 Landing Pages
+
+**Linear.app** - https://linear.app
+- **Use for:** Overall page structure, hero section, navigation, typography hierarchy
+- **Specific elements:** Navbar design, button styles, spacing rhythm
+- **Note to devs:** Study their hero animation and scroll-triggered reveals
+
+**Vercel.com** - https://vercel.com
+- **Use for:** Premium gradient backgrounds, feature cards, footer design
+- **Specific elements:** Background mesh patterns, subtle animations
+- **Note to devs:** Inspect their use of backdrop-filter and blur effects
+
+**Anthropic.com** - https://www.anthropic.com
+- **Use for:** Professional tone, clean layouts, mission-statement styling
+- **Specific elements:** Typography choices, white space usage
+- **Note to devs:** Notice how they balance text density with breathing room
+
+**Superhuman.com** - https://superhuman.com
+- **Use for:** Premium SaaS aesthetic, CTA sections, benefit callouts
+- **Specific elements:** Pricing tables, social proof sections
+- **Note to devs:** Excellent button hover states and micro-interactions
+
+**Notion.so** - https://www.notion.so
+- **Use for:** Feature showcases, use case sections, product cards
+- **Specific elements:** Card hover effects, illustration integration
+- **Note to devs:** Study their progressive image loading
+
+### 10.2 Application Interfaces
+
+**Linear.app (Main App)** - https://linear.app (requires account)
+- **Use for:** Sidebar navigation, top bar, keyboard shortcuts, command palette
+- **Specific elements:** Panel layouts, modal designs, dropdown menus
+- **Note to devs:** Best-in-class example of clean workspace design
+
+**Notion (Editor)** - https://www.notion.so (requires account)
+- **Use for:** Document editing interface, block-based content, collaborative features
+- **Specific elements:** Inline toolbars, drag handles, nested content
+- **Note to devs:** Reference for Scribe document preview
+
+**Hex.tech** - https://hex.tech (can view demo workspace)
+- **Use for:** Data analyst interface, notebook layout, chart rendering
+- **Specific elements:** Output cells, code execution status, data tables
+- **Note to devs:** This is the gold standard for Data Analyst preview pane
+
+**Perplexity.ai** - https://www.perplexity.ai
+- **Use for:** Chat interface, source citations, research summaries
+- **Specific elements:** Message formatting, citation cards, follow-up suggestions
+- **Note to devs:** Study their clean chat bubble design and source cards
+
+**Observable HQ** - https://observablehq.com (view public notebooks)
+- **Use for:** Interactive data visualizations, reactive notebooks
+- **Specific elements:** Code cells, chart outputs, interactivity patterns
+- **Note to devs:** Best practices for embedding Recharts visualizations
+
+**Replit.com** - https://replit.com (can use without account)
+- **Use for:** Code editor layout, file tree, terminal integration
+- **Specific elements:** Multi-panel workspace, console output styling
+- **Note to devs:** Reference for code block styling in chat
+
+### 10.3 Specific Component References
+
+**GitHub Settings** - https://github.com/settings (requires account)
+- **Use for:** Settings page layout, form organization, navigation patterns
+- **Specific elements:** Sidebar navigation for settings, form styling
+- **Note to devs:** Clean hierarchy and grouping of options
+
+**Stripe Dashboard** - https://dashboard.stripe.com (requires account)
+- **Use for:** Data-heavy dashboards, table designs, filters
+- **Specific elements:** Complex tables, date pickers, export functions
+- **Note to devs:** Study their loading skeletons
+
+**Figma** - https://www.figma.com (view in-app design)
+- **Use for:** Panel resizing, drag interactions, context menus
+- **Specific elements:** Panel dividers, collapsible sections
+- **Note to devs:** Excellent resizable panel implementation
+
+**ElevenLabs** - https://elevenlabs.io
+- **Use for:** Modern gradient usage, animated backgrounds
+- **Specific elements:** Hero gradients, accent color application
+- **Note to devs:** See how they use bold colors tastefully
+
+**Intercom** - https://www.intercom.com
+- **Use for:** Chat widget design, messaging patterns
+- **Specific elements:** Chat bubbles, typing indicators, timestamps
+- **Note to devs:** Reference for chat panel design patterns
+
+---
+
+## 11. Asset Requirements
+
+### 11.1 Icons
+**Primary Library:** Lucide React - https://lucide.dev
+- Install: `npm install lucide-react`
+- Usage: `import { IconName } from 'lucide-react'`
+- Default size: 20px
+- Color: Inherit from parent
+
+**Specific Icons Needed:**
+```javascript
+// Navigation
+- LayoutDashboard (workspace)
+- Settings
+- User
+- Bell (notifications)
+- Menu (hamburger)
+
+// Agents
+- Network or Workflow (Atlas)
+- BarChart3 or TrendingUp (Data Analyst)
+- FileText or BookOpen (Scribe)
+- Search or Microscope (Researcher)
+
+// Actions
+- Play, Pause, Square (execution controls)
+- Download, Upload, Share2
+- Copy, Check, X
+- ChevronDown, ChevronRight
+- Plus, Minus, MoreVertical
+
+// Status
+- CheckCircle (success)
+- AlertCircle (error)
+- Clock (pending)
+- Loader (loading)
+
+// Communication
+- Send, Paperclip
+- MessageSquare
+```
+
+### 11.2 Placeholder Images
+
+**Stock photos to replace later:**
+1. **Hero background mesh** - Generate with CSS gradient or use from Unsplash
+   - Search: "abstract gradient dark blue gold"
+   - Recommended: https://unsplash.com/s/photos/abstract-gradient
+
+2. **Agent card illustrations** (optional decorative)
+   - Can use icons instead OR
+   - Simple geometric shapes/patterns
+   - Keep minimal - not required
+
+3. **Use case section backgrounds**
+   - Subtle texture overlays
+   - Can be pure CSS
+
+4. **Avatar placeholders**
+   - Use https://ui-avatars.com API
+   - Format: `https://ui-avatars.com/api/?name=User+Name&background=ECCE6E&color=0C1120`
+
+5. **Empty state illustrations**
+   - Use Lucide icons at large sizes
+   - OR generate simple SVG illustrations
+   - Keep monochromatic (silver/gold)
+
+### 11.3 Fonts
+
+**Download and self-host:**
+
+1. **Inter Variable**
+   - Source: https://rsms.me/inter/
+   - Download: Variable font file
+   - Weights needed: 400 (Regular), 600 (SemiBold), 700 (Bold)
+
+2. **JetBrains Mono**
+   - Source: https://www.jetbrains.com/lp/mono/
+   - Download: Variable font file
+   - Weight: 400 (Regular)
+
+**Font loading setup:**
+```css
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Variable.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-display: swap;
+}
+```
+
+---
+
+## 12. Testing & QA Guidelines
+
+### 12.1 Browser Testing Matrix
+
+**Desktop:**
+- [ ] Chrome (latest, latest-1)
+- [ ] Firefox (latest, latest-1)
+- [ ] Safari (latest)
+- [ ] Edge (latest)
+
+**Mobile:**
+- [ ] iOS Safari (iOS 15, 16, 17)
+- [ ] Chrome Mobile (Android 11+)
+- [ ] Samsung Internet
+
+**Tablet:**
+- [ ] iPad Safari (landscape + portrait)
+- [ ] Android Chrome tablet
+
+### 12.2 Responsive Testing Viewports
+
+Test at these specific widths:
+- 320px (iPhone SE)
+- 375px (iPhone standard)
+- 390px (iPhone Pro)
+- 768px (iPad portrait)
+- 1024px (iPad landscape / small laptop)
+- 1280px (standard laptop)
+- 1440px (large laptop)
+- 1920px (desktop)
+
+### 12.3 Accessibility Testing
+
+**Tools to use:**
+1. **axe DevTools** (Chrome extension)
+   - Run on every major page
+   - Fix all violations
+
+2. **WAVE** (Chrome extension)
+   - Verify contrast ratios
+   - Check heading hierarchy
+
+3. **Keyboard navigation test:**
+   - Tab through entire interface
+   - Verify focus indicators visible
+   - Test with screen reader (NVDA/JAWS/VoiceOver)
+
+4. **Color blindness simulation:**
+   - Use Chrome DevTools Rendering panel
+   - Test all variants
+
+### 12.4 Performance Testing
+
+**Lighthouse Scores (Target):**
+- Performance: > 90
+- Accessibility: 100
+- Best Practices: > 95
+- SEO: > 90
+
+**Key Metrics:**
+- First Contentful Paint: < 1.5s
+- Largest Contentful Paint: < 2.5s
+- Time to Interactive: < 3.5s
+- Cumulative Layout Shift: < 0.1
+
+**Test with:**
+- Throttled 3G connection
+- Slow CPU (6x slowdown in DevTools)
+
+---
+
+## 13. Handoff Artifacts to Provide
+
+After development, prepare:
+
+### 13.1 Living Style Guide
+Create a page showcasing:
+- All button variants
+- Form elements
+- Cards
+- Modals
+- Typography scale
+- Color palette
+- Icons
+- Spacing examples
+
+**Tool:** Storybook OR simple Next.js page
+
+### 13.2 Component Documentation
+For each component, document:
+```typescript
+/**
+ * Primary CTA button component
+ * 
+ * @param {string} label - Button text
+ * @param {function} onClick - Click handler
+ * @param {boolean} loading - Shows spinner when true
+ * @param {boolean} disabled - Disables interaction
+ * @param {string} size - 'sm' | 'md' | 'lg'
+ * 
+ * @example
+ * <PrimaryButton 
+ *   label="Get Started" 
+ *   onClick={handleClick}
+ *   size="lg"
+ * />
+ */
+```
+
+### 13.3 Deployment Checklist
+- [ ] Environment variables configured
+- [ ] Fonts loading correctly
+- [ ] Images compressed and lazy-loaded
+- [ ] Error tracking set up (Sentry)
+- [ ] Analytics integrated
+- [ ] Meta tags for SEO
+- [ ] Social share images (OG tags)
+- [ ] Favicon and app icons
+- [ ] robots.txt and sitemap.xml
+- [ ] HTTPS enforced
+- [ ] CSP headers configured
+
+---
+
+## 14. Final Notes for Junior Developers
+
+### 14.1 Common Pitfalls to Avoid
+
+**❌ DON'T:**
+- Hardcode colors - always use design tokens
+- Use inline styles - use Tailwind classes
+- Forget mobile-first approach
+- Skip loading states
+- Ignore empty states
+- Use `div` for everything - use semantic HTML
+- Forget keyboard navigation
+- Skip error boundaries
+- Use `any` in TypeScript
+- Commit commented-out code
+
+**✅ DO:**
+- Follow the 8px spacing grid religiously
+- Test on real devices, not just browser DevTools
+- Use semantic HTML (`nav`, `main`, `section`)
+- Add ARIA labels where needed
+- Implement proper error handling
+- Use TypeScript strictly
+- Write meaningful commit messages
+- Ask questions if specs unclear
+- Reference the inspiration sites when stuck
+- Measure performance regularly
+
+### 14.2 When in Doubt
+
+**For visual questions:**
+1. Check Linear.app first (it's your north star)
+2. Then check specific reference for that component type
+3. Default to simplicity - less is more
+
+**For interaction patterns:**
+1. Ensure it feels smooth (60fps)
+2. Transitions should be quick (200-300ms)
+3. Hover states should be subtle
+4. Mobile taps need immediate visual feedback
+
+**For spacing:**
+1. Use multiples of 8px: 8, 16, 24, 32, 48, 64
+2. When in doubt, add more space (not less)
+3. Content should breathe
+
+### 14.3 Success Criteria
+
+Your work is complete when:
+- [ ] It looks like the references (but with our branding)
+- [ ] It works on all specified devices/browsers
+- [ ] Lighthouse scores meet targets
+- [ ] No accessibility violations
+- [ ] Loading states handled everywhere
+- [ ] Error states handled everywhere
+- [ ] Someone can use it with just keyboard
+- [ ] Someone can use it with screen reader
+- [ ] It feels fast and responsive
+- [ ] Code is clean and documented
+
+---
+
+## 15. Quick Reference Card
+
+**Colors:**
+Background: #0C1120 (midnight)
+Panels: #1A2334 (pacific)
+Accent: #ECCE6E (gold)
+Text primary: #F8F9FB
+Text secondary: #A8B1C4
+Borders: rgba(199, 204, 216, 0.1-0.2)
+
+**Spacing:** 8px grid (8, 16, 24, 32, 48, 64, 96, 128)
+
+**Border Radius:** 8px (buttons), 12px (cards), 16px (modals)
+
+**Fonts:** 
+- UI: Inter (400, 600, 700)
+- Code: JetBrains Mono (400)
+
+**Shadows:** Use sparingly, max `0 12px 32px rgba(12, 17, 32, 0.3)`
+
+**Transitions:** 200-300ms for most interactions
+
+**Breakpoints:** 768px (tablet), 1024px (desktop)
+
+---
+
+This specification should give your junior developers everything they need. If specific sections need more detail or if you want me to create actualRetryDContinuecode examples for any specific components, let me know!
+
+16. Component Code Examples (For Critical Components)
+To ensure junior developers implement correctly, here are detailed examples for the most important components:
+16.1 Primary Button Component
+typescript// components/Button.tsx
+import { Loader } from 'lucide-react';
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  fullWidth?: boolean;
+}
+
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  loading = false,
+  disabled = false,
+  children,
+  onClick,
+  type = 'button',
+  fullWidth = false,
+}: ButtonProps) {
+  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 ease-out inline-flex items-center justify-center gap-2';
+  
+  const variantClasses = {
+    primary: 'bg-[#ECCE6E] text-[#0C1120] hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]',
+    secondary: 'bg-transparent border border-[#C7CCD8] text-[#F8F9FB] hover:bg-[rgba(199,204,216,0.1)] hover:border-[#ECCE6E]',
+    ghost: 'bg-transparent text-[#F8F9FB] hover:bg-[rgba(199,204,216,0.05)]',
+  };
+  
+  const sizeClasses = {
+    sm: 'h-9 px-4 text-sm',
+    md: 'h-12 px-6 text-base',
+    lg: 'h-[52px] px-8 text-base',
+  };
+  
+  const disabledClasses = 'opacity-40 cursor-not-allowed hover:scale-100 hover:brightness-100';
+  const widthClasses = fullWidth ? 'w-full' : '';
+  
+  const classes = `
+    ${baseClasses}
+    ${variantClasses[variant]}
+    ${sizeClasses[size]}
+    ${(disabled || loading) ? disabledClasses : ''}
+    ${widthClasses}
+  `.trim();
+  
+  return (
+    <button
+      type={type}
+      className={classes}
+      onClick={onClick}
+      disabled={disabled || loading}
+      aria-busy={loading}
+    >
+      {loading && <Loader className="w-4 h-4 animate-spin" />}
+      {children}
+    </button>
+  );
+}
+Usage:
+typescript<Button variant="primary" size="lg" onClick={handleClick}>
+  Get Started Free
+</Button>
+
+<Button variant="secondary" loading={isLoading}>
+  Sign In
+</Button>
+
+16.2 Input Component
+typescript// components/Input.tsx
+import { useState } from 'react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+
+interface InputProps {
+  label?: string;
+  type?: 'text' | 'email' | 'password' | 'number';
+  placeholder?: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  disabled?: boolean;
+  required?: boolean;
+  fullWidth?: boolean;
+}
+
+export function Input({
+  label,
+  type = 'text',
+  placeholder,
+  value,
+  onChange,
+  error,
+  disabled = false,
+  required = false,
+  fullWidth = true,
+}: InputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  
+  const inputType = type === 'password' && showPassword ? 'text' : type;
+  
+  const baseClasses = 'h-12 px-4 rounded-lg font-inter text-[15px] text-[#F8F9FB] placeholder:text-[#A8B1C4] transition-all duration-200';
+  const bgClasses = isFocused ? 'bg-[rgba(26,35,52,0.8)]' : 'bg-[rgba(26,35,52,0.5)]';
+  const borderClasses = error 
+    ? 'border border-[#EF4444]' 
+    : isFocused 
+      ? 'border border-[#ECCE6E]' 
+      : 'border border-[rgba(199,204,216,0.2)]';
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
+  const widthClasses = fullWidth ? 'w-full' : '';
+  
+  return (
+    <div className={`flex flex-col gap-2 ${widthClasses}`}>
+      {label && (
+        <label className="text-sm font-semibold text-[#C7CCD8]">
+          {label}
+          {required && <span className="text-[#EF4444] ml-1">*</span>}
+        </label>
+      )}
+      
+      <div className="relative">
+        <input
+          type={inputType}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          className={`${baseClasses} ${bgClasses} ${borderClasses} ${disabledClasses} ${type === 'password' ? 'pr-12' : ''}`}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${label}-error` : undefined}
+        />
+        
+        {type === 'password' && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#A8B1C4] hover:text-[#F8F9FB] transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        )}
+      </div>
+      
+      {error && (
+        <div id={`${label}-error`} className="flex items-center gap-2 text-[#EF4444] text-xs">
+          <AlertCircle size={14} />
+          <span>{error}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+Usage:
+typescriptconst [email, setEmail] = useState('');
+const [emailError, setEmailError] = useState('');
+
+<Input
+  label="Email"
+  type="email"
+  value={email}
+  onChange={setEmail}
+  error={emailError}
+  placeholder="you@example.com"
+  required
+/>
+
+16.3 Card Component
+typescript// components/Card.tsx
+interface CardProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'feature' | 'status';
+  hoverable?: boolean;
+  className?: string;
+  onClick?: () => void;
+}
+
+export function Card({
+  children,
+  variant = 'default',
+  hoverable = false,
+  className = '',
+  onClick,
+}: CardProps) {
+  const baseClasses = 'rounded-xl transition-all duration-300 ease-out';
+  
+  const variantClasses = {
+    default: 'bg-[#1A2334] border border-[rgba(199,204,216,0.15)] p-6',
+    feature: 'bg-[rgba(26,35,52,0.6)] border border-[rgba(199,204,216,0.12)] p-8 backdrop-blur-xl',
+    status: 'bg-[rgba(12,17,32,0.8)] border-l-[3px] border-l-[#A8B1C4] rounded-lg p-4',
+  };
+  
+  const hoverClasses = hoverable 
+    ? 'hover:border-[rgba(236,206,110,0.4)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(12,17,32,0.3)] cursor-pointer' 
+    : '';
+  
+  const classes = `${baseClasses} ${variantClasses[variant]} ${hoverClasses} ${className}`;
+  
+  return (
+    <div className={classes} onClick={onClick} role={onClick ? 'button' : undefined}>
+      {children}
+    </div>
+  );
+}
+Usage:
+typescript<Card variant="feature" hoverable>
+  <div className="flex flex-col gap-4">
+    <Network className="w-12 h-12 text-[#ECCE6E]" />
+    <h3 className="text-xl font-semibold text-[#F8F9FB]">Atlas</h3>
+    <p className="text-[#A8B1C4] leading-relaxed">
+      Your intelligent workflow architect.
+    </p>
+  </div>
+</Card>
+
+16.4 Modal Component
+typescript// components/Modal.tsx
+import { X } from 'lucide-react';
+import { useEffect } from 'react';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  children: React.ReactNode;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = 'md',
+}: ModalProps) {
+  // Close on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+  
+  if (!isOpen) return null;
+  
+  const sizeClasses = {
+    sm: 'max-w-md',
+    md: 'max-w-2xl',
+    lg: 'max-w-4xl',
+  };
+  
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'modal-title' : undefined}
+    >
+      {/* Overlay */}
+      <div 
+        className="absolute inset-0 bg-[rgba(12,17,32,0.85)] backdrop-blur-lg animate-fadeIn"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      
+      {/* Modal content */}
+      <div 
+        className={`relative bg-[#1A2334] border border-[rgba(199,204,216,0.2)] rounded-2xl p-10 shadow-[0_20px_60px_rgba(0,0,0,0.4)] animate-scaleIn w-full ${sizeClasses[size]}`}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 text-[#A8B1C4] hover:text-[#F8F9FB] transition-colors"
+          aria-label="Close modal"
+        >
+          <X size={24} />
+        </button>
+        
+        {/* Title */}
+        {title && (
+          <h2 id="modal-title" className="text-2xl font-semibold text-[#F8F9FB] mb-6">
+            {title}
+          </h2>
+        )}
+        
+        {/* Content */}
+        <div className="text-[#F8F9FB]">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+CSS animations to add to globals.css:
+css@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 200ms ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+16.5 Agent Card Component (Landing Page)
+typescript// components/AgentCard.tsx
+import { LucideIcon } from 'lucide-react';
+import { Check } from 'lucide-react';
+
+interface AgentCardProps {
+  icon: LucideIcon;
+  name: string;
+  tagline: string;
+  description: string;
+  features: string[];
+}
+
+export function AgentCard({
+  icon: Icon,
+  name,
+  tagline,
+  description,
+  features,
+}: AgentCardProps) {
+  return (
+    <div className="bg-[#1A2334] border border-[rgba(199,204,216,0.15)] rounded-2xl p-10 transition-all duration-300 ease-out hover:border-[rgba(236,206,110,0.4)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(12,17,32,0.3)] group">
+      {/* Icon */}
+      <Icon className="w-12 h-12 text-[#ECCE6E] mb-6 transition-transform duration-300 group-hover:scale-110" />
+      
+      {/* Name */}
+      <h3 className="text-[28px] font-semibold text-[#F8F9FB] mb-2">
+        {name}
+      </h3>
+      
+      {/* Tagline */}
+      <p className="text-base text-[#A8B1C4] mb-6">
+        {tagline}
+      </p>
+      
+      {/* Description */}
+      <p className="text-[15px] text-[#C7CCD8] leading-[1.7] mb-6">
+        {description}
+      </p>
+      
+      {/* Features */}
+      <ul className="space-y-3">
+        {features.map((feature, index) => (
+          <li key={index} className="flex items-start gap-3 text-sm text-[#C7CCD8]">
+            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-[rgba(236,206,110,0.15)] flex items-center justify-center mt-0.5">
+              <Check className="w-3 h-3 text-[#ECCE6E]" />
+            </div>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+Usage on landing page:
+typescriptimport { Network, BarChart3, FileText, Search } from 'lucide-react';
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1400px] mx-auto px-8">
+  <AgentCard
+    icon={Network}
+    name="Atlas"
+    tagline="Your intelligent workflow architect."
+    description="Converts natural language into executable workflows. Plans, executes, and adapts—orchestrating other agents and real-world actions without code."
+    features={[
+      'Multi-step automation',
+      'Agent coordination',
+      'Self-correcting execution',
+    ]}
+  />
+  
+  <AgentCard
+    icon={BarChart3}
+    name="Data Analyst"
+    tagline="Upload data. Ask questions. Get real analysis."
+    description="Accepts CSVs, Excel, PDFs. Writes Python, runs analysis in a secure sandbox, delivers clean charts and insights—instantly."
+    features={[
+      'Python sandbox execution',
+      'Interactive visualizations',
+      'Statistical testing',
+    ]}
+  />
+  
+  {/* Add Scribe and Researcher similarly */}
+</div>
+
+16.6 Chat Message Component
+typescript// components/ChatMessage.tsx
+import { User, Bot } from 'lucide-react';
+
+interface ChatMessageProps {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp?: Date;
+  streaming?: boolean;
+}
+
+export function ChatMessage({
+  role,
+  content,
+  timestamp,
+  streaming = false,
+}: ChatMessageProps) {
+  const isUser = role === 'user';
+  
+  return (
+    <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
+      {/* Avatar (only for assistant) */}
+      {!isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(236,206,110,0.15)] flex items-center justify-center">
+          <Bot className="w-5 h-5 text-[#ECCE6E]" />
+        </div>
+      )}
+      
+      {/* Message content */}
+      <div className={`max-w-[85%] ${isUser ? 'max-w-[80%]' : 'max-w-[90%]'}`}>
+        <div className={`rounded-xl px-4 py-3 ${
+          isUser 
+            ? 'bg-[rgba(236,206,110,0.1)] border border-[rgba(236,206,110,0.2)]' 
+            : 'bg-[rgba(26,35,52,0.8)] border border-[rgba(199,204,216,0.15)]'
+        }`}>
+          <p className="text-[15px] text-[#F8F9FB] leading-relaxed whitespace-pre-wrap">
+            {content}
+            {streaming && <span className="inline-block w-1 h-4 bg-[#ECCE6E] animate-pulse ml-1" />}
+          </p>
+        </div>
+        
+        {/* Timestamp */}
+        {timestamp && (
+          <span className="text-xs text-[#A8B1C4] mt-1 inline-block">
+            {timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        )}
+      </div>
+      
+      {/* Avatar (only for user) */}
+      {isUser && (
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[rgba(199,204,216,0.2)] flex items-center justify-center">
+          <User className="w-5 h-5 text-[#C7CCD8]" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+16.7 Skeleton Loader Component
+typescript// components/SkeletonLoader.tsx
+interface SkeletonProps {
+  variant?: 'text' | 'title' | 'card' | 'circle';
+  width?: string;
+  height?: string;
+  className?: string;
+}
+
+export function Skeleton({
+  variant = 'text',
+  width,
+  height,
+  className = '',
+}: SkeletonProps) {
+  const baseClasses = 'animate-shimmer bg-gradient-to-r from-[rgba(26,35,52,0.4)] via-[rgba(26,35,52,0.6)] to-[rgba(26,35,52,0.4)] bg-[length:200%_100%]';
+  
+  const variantClasses = {
+    text: 'h-4 rounded',
+    title: 'h-8 rounded',
+    card: 'h-48 rounded-xl',
+    circle: 'rounded-full',
+  };
+  
+  const style = {
+    width: width || (variant === 'circle' ? height : '100%'),
+    height: height || undefined,
+  };
+  
+  return (
+    <div 
+      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      style={style}
+      aria-busy="true"
+      aria-live="polite"
+    />
+  );
+}
+
+// Table skeleton example
+export function TableSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <div className="space-y-3">
+      {/* Header */}
+      <div className="flex gap-4 pb-3 border-b border-[rgba(199,204,216,0.1)]">
+        <Skeleton width="30%" height="12px" />
+        <Skeleton width="25%" height="12px" />
+        <Skeleton width="20%" height="12px" />
+        <Skeleton width="25%" height="12px" />
+      </div>
+      
+      {/* Rows */}
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex gap-4">
+          <Skeleton width="30%" />
+          <Skeleton width="25%" />
+          <Skeleton width="20%" />
+          <Skeleton width="25%" />
+        </div>
+      ))}
+    </div>
+  );
+}
+Add to globals.css:
+css@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+17. Layout Templates
+17.1 Landing Page Hero Section (Complete)
+typescript// app/page.tsx (or pages/index.tsx)
+import { Button } from '@/components/Button';
+
+export default function HeroSection() {
+  return (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background gradient mesh */}
+      <div className="absolute inset-0 bg-[#0C1120]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(236,206,110,0.03)_0%,rgba(26,35,52,0.6)_100%)]" />
+      </div>
+      
+      {/* Content */}
+      <div className="relative z-10 max-w-[1100px] mx-auto px-8 text-center">
+        <h1 className="text-[72px] md:text-[56px] sm:text-[36px] font-bold text-[#F8F9FB] leading-[1.1] tracking-[-0.02em] mb-6 animate-fadeInUp" style={{ animationDelay: '0.6s', animationFillMode: 'both' }}>
+          Work with intelligent agents that<br />
+          think, analyze, write, and automate.
+        </h1>
+        
+        <p className="text-xl md:text-lg text-[#A8B1C4] leading-relaxed max-w-[700px] mx-auto mb-12 animate-fadeInUp" style={{ animationDelay: '0.8s', animationFillMode: 'both' }}>
+          All your core workflows—automation, analysis, documents, and research—handled by AI assistants that understand you, coordinate together, and deliver results instantly.
+        </p>
+        
+        <div className="flex gap-4 justify-center animate-fadeInUp" style={{ animationDelay: '1.0s', animationFillMode: 'both' }}>
+          <Button variant="primary" size="lg">
+            Try It Free
+          </Button>
+          <Button variant="secondary" size="lg">
+            View Agents
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+Add to globals.css:
+css@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 600ms ease-out;
+}
+
+17.2 Application Shell Layout
+typescript// components/AppShell.tsx
+import { useState } from 'react';
+import { Menu, X, MessageSquare } from 'lucide-react';
+import Sidebar from './Sidebar';
+import TopBar from './TopBar';
+import PreviewPane from './PreviewPane';
+import ChatPanel from './ChatPanel';
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [chatOpen, setChatOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+        setChatOpen(false);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  return (
+    <div className="h-screen flex flex-col bg-[#0C1120]">
+      {/* Top Bar */}
+      <TopBar 
+        onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+        isMobile={isMobile}
+      />
+      
+      {/* Main content area */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar 
+          isOpen={sidebarOpen}
+          isMobile={isMobile}
+          onClose={() => setSidebarOpen(false)}
+        />
+        
+        {/* Preview Pane */}
+        <main className={`flex-1 overflow-auto transition-all duration-300 ${
+          !sidebarOpen && !chatOpen ? 'w-full' : ''
+        }`}>
+          {children}
+        </main>
+        
+        {/* Chat Panel */}
+        {!isMobile && (
+          <ChatPanel isOpen={chatOpen} />
+        )}
+      </div>
+      
+      {/* Mobile chat FAB */}
+      {isMobile && !chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-[#ECCE6E] text-[#0C1120] shadow-[0_8px_24px_rgba(236,206,110,0.4)] flex items-center justify-center z-50 hover:scale-110 transition-transform"
+          aria-label="Open chat"
+        >
+          <MessageSquare className="w-6 h-6" />
+        </button>
+      )}
+      
+      {/* Mobile chat overlay */}
+      {isMobile && chatOpen && (
+        <div className="fixed inset-0 z-50 bg-[#1A2334]">
+          <div className="h-full flex flex-col">
+            <div className="h-14 px-4 flex items-center justify-between border-b border-[rgba(199,204,216,0.1)]">
+              <h2 className="font-semibold text-[#F8F9FB]">Chat</h2>
+              <button 
+                onClick={() => setChatOpen(false)}
+                className="text-[#A8B1C4] hover:text-[#F8F9FB]"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <ChatPanel isOpen={true} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+18. Tailwind Configuration
+javascript// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        midnight: '#0C1120',
+        gold: '#ECCE6E',
+        silver: '#C7CCD8',
+        pacific: '#1A2334',
+        moonlight: '#F8F9FB',
+        softSky: '#A8B1C4',
+        emerald: '#4ADE80',
+        skyBlue: '#38BDF8',
+        crimson: '#EF4444',
+      },
+      fontFamily: {
+        inter: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      spacing: {
+        '128': '32rem',
+      },
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+      },
+      backdropBlur: {
+        'xs': '2px',
+      },
+      boxShadow: {
+        'subtle': '0 1px 3px rgba(12, 17, 32, 0.12)',
+        'medium': '0 4px 12px rgba(12, 17, 32, 0.15)',
+        'panel': '0 8px 24px rgba(12, 17, 32, 0.20)',
+        'gold': '0 8px 24px rgba(236, 206, 110, 0.4)',
+      },
+      animation: {
+        'spin': 'spin 800ms linear infinite',
+        'pulse': 'pulse 1.5s ease-in-out infinite',
+      },
+    },
+  },
+  plugins: [],
+}
+
+19. Global Styles
+css/* globals.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Font imports */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Variable.woff2') format('woff2');
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #0C1120;
+  color: #F8F9FB;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
