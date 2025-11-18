@@ -3,6 +3,10 @@ import LandingPage from './pages/LandingPage'
 import SignUpPage from './pages/SignUpPage'
 import SignInPage from './pages/SignInPage'
 import AppShell from './pages/AppShell'
+import DazaiPage from './pages/DazaiPage'
+import AtlasPage from './pages/AtlasPage'
+import ScribePage from './pages/ScribePage'
+import RiaxPage from './pages/RiaxPage'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('landing')
@@ -25,6 +29,10 @@ function App() {
       {currentPage === 'signup' && <SignUpPage />}
       {currentPage === 'signin' && <SignInPage />}
       {currentPage === 'app' && <AppShell />}
+      {currentPage === 'dazai' && <DazaiPage />}
+      {currentPage === 'atlas' && <AtlasPage />}
+      {currentPage === 'scribe' && <ScribePage />}
+      {currentPage === 'riax' && <RiaxPage />}
     </>
   )
 }

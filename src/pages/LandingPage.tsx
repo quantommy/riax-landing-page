@@ -16,10 +16,11 @@ export default function LandingPage() {
         'Coordinates other agents seamlessly',
         'Self-correcting execution with reflection',
       ],
+      route: 'atlas',
     },
     {
       icon: BarChart3,
-      name: 'Data Analyst',
+      name: 'Dazai',
       tagline: 'Upload data. Ask questions. Get real analysis.',
       description: 'Accepts CSVs, Excel, PDFs. Writes Python, runs analysis in a secure sandbox, delivers clean charts and insights—instantly.',
       features: [
@@ -27,10 +28,11 @@ export default function LandingPage() {
         'Interactive visualizations',
         'Statistical testing',
       ],
+      route: 'dazai',
     },
     {
       icon: FileText,
-      name: 'The Scribe',
+      name: 'Scribe',
       tagline: 'Documents that look official, polished, effortless.',
       description: 'Transforms raw content into structured documents—reports, papers, proposals. Match existing formats or create from scratch.',
       features: [
@@ -38,10 +40,11 @@ export default function LandingPage() {
         'Citation management',
         'Format matching',
       ],
+      route: 'scribe',
     },
     {
       icon: Search,
-      name: 'Researcher',
+      name: 'Riax',
       tagline: 'Deep research, sources, and synthesis on demand.',
       description: 'Investigates across papers, articles, and datasets. Produces structured findings with evidence maps and verified citations.',
       features: [
@@ -49,6 +52,7 @@ export default function LandingPage() {
         'Evidence mapping',
         'Contradiction detection',
       ],
+      route: 'riax',
     },
   ];
 
@@ -149,7 +153,15 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {agents.map((agent, index) => (
-              <AgentCard key={index} {...agent} />
+              <AgentCard
+                key={index}
+                icon={agent.icon}
+                name={agent.name}
+                tagline={agent.tagline}
+                description={agent.description}
+                features={agent.features}
+                onClick={() => (window.location.hash = agent.route)}
+              />
             ))}
           </div>
         </div>
