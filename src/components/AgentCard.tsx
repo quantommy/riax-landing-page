@@ -6,6 +6,7 @@ interface AgentCardProps {
   tagline: string;
   description: string;
   features: string[];
+  onClick?: () => void;
 }
 
 export function AgentCard({
@@ -14,9 +15,16 @@ export function AgentCard({
   tagline,
   description,
   features,
+  onClick,
 }: AgentCardProps) {
   return (
-    <div className="group bg-pacific border border-[rgba(199,204,216,0.15)] rounded-2xl p-10 transition-all duration-300 ease-out hover:border-[rgba(236,206,110,0.4)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(12,17,32,0.3)]">
+    <div
+      className="group bg-pacific border border-[rgba(199,204,216,0.15)] rounded-2xl p-10 transition-all duration-300 ease-out hover:border-[rgba(236,206,110,0.4)] hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(12,17,32,0.3)] cursor-pointer"
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+    >
       {/* Background decoration (subtle) */}
       <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-[radial-gradient(circle_at_top_right,#ECCE6E,transparent_70%)]" />
 
